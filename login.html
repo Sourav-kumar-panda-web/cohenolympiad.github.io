@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link rel="stylesheet" href="register.css">
+</head>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+
+<body>
+  <div class="register-container">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <label for="username">Phone Number:</label>
+      <input type="text" id="username" required>
+
+      <label for="password">Date of Birth:</label>
+      <input type="date" id="password" required>
+
+      <button type="submit">Login</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      // Simulate login: username must be 10 digits and dob must not be empty
+      if (username.length === 10 && password) {
+        localStorage.setItem('loggedIn', 'true');
+        localStorage.setItem('userPhone', username);
+        window.location.href = 'home.html';
+      } else {
+        alert('Invalid login. Please enter valid phone number and DOB.');
+      }
+    });
+  </script>
+</body>
+</html>
+
+
