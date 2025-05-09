@@ -1,17 +1,3 @@
-// Typewriter effect
-const typewriterText = document.getElementById('typewriter');
-const text = "Learn, Practice, and Excel with LIA!";
-let i = 0;
-
-function typeWriter() {
-  if (i < text.length) {
-    typewriterText.innerHTML += text.charAt(i);
-    i++;
-    setTimeout(typeWriter, 100);
-  }
-}
-
-window.onload = typeWriter;
 
 // Hamburger Menu Toggle
 function toggleMenu() {
