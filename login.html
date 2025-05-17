@@ -3,43 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <title>Login</title>
-  <link rel="stylesheet" href="register.css">
+ <link rel="stylesheet" href="login.css">
+
+  <style>
+    .hidden { display: none; }
+  </style>
 </head>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-
 <body>
-  <div class="register-container">
-    <h2>Login</h2>
-    <form id="loginForm">
-      <label for="username">Phone Number:</label>
-      <input type="text" id="username" required>
 
-      <label for="password">Date of Birth:</label>
-      <input type="date" id="password" required>
-
-      <button type="submit">Login</button>
-    </form>
+  <div class="role-select">
+    <h2>Login As</h2>
+    <button onclick="showForm('student')">Student</button>
+    <button onclick="showForm('admin')">Admin</button>
   </div>
 
+  <!-- Student Login Form -->
+  <form id="student-login" class="hidden" action="/login" method="POST">
+    <h3>Student Login</h3>
+    <input name="email" placeholder="Email" required><br>
+    <input name="password" type="password" placeholder="Password" required><br>
+    <button type="submit">Login</button>
+  </form>
+
+  <!-- Admin Login Form -->
+  <form id="admin-login" class="hidden" action="/admin-login" method="POST" onsubmit="return validateCaptcha()">
+    <h3>Admin Login</h3>
+    <input type="text" name="username" placeholder="Admin Username" required><br>
+    <input type="password" name="password" placeholder="Password" required><br>
+    <label id="captchaLabel"></label>
+    <input type="number" id="captchaInput" required><br>
+    <button type="submit">Login as Admin</button>
+  </form>
+
   <script>
-    document.getElementById('loginForm').addEventListener('submit', function (e) {
-      e.preventDefault();
+    function showForm(role) {
+      document.getElementById('student-login').classList.add('hidden');
+      document.getElementById('admin-login').classList.add('hidden');
 
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-
-      // Simulate login: username must be 10 digits and dob must not be empty
-      if (username.length === 10 && password) {
-        localStorage.setItem('loggedIn', 'true');
-        localStorage.setItem('userPhone', username);
-        window.location.href = 'home.html';
+      if (role === 'student') {
+        document.getElementById('student-login').classList.remove('hidden');
       } else {
-        alert('Invalid login. Please enter valid phone number and DOB.');
+        document.getElementById('admin-login').classList.remove('hidden');
+        generateCaptcha(); // Optional: if you're using CAPTCHA
       }
-    });
+    }
+
+    function generateCaptcha() {
+      const num1 = Math.floor(Math.random() * 10);
+      const num2 = Math.floor(Math.random() * 10);
+      document.getElementById('captchaLabel').innerText = `What is ${num1} + ${num2}?`;
+      document.getElementById('captchaLabel').dataset.answer = num1 + num2;
+    }
+
+    function validateCaptcha() {
+      const correct = parseInt(document.getElementById('captchaLabel').dataset.answer);
+      const input = parseInt(document.getElementById('captchaInput').value);
+      if (correct !== input) {
+        alert('Incorrect CAPTCHA!');
+        return false;
+      }
+      return true;
+    }
   </script>
+
 </body>
 </html>
-
-

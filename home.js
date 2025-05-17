@@ -67,3 +67,5 @@ document.getElementById('logout-btn').addEventListener('click', () => {
   localStorage.removeItem('isLoggedIn');
   window.location.href = 'index.html';
 });
+const express = require('express');
+const app = express();

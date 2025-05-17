@@ -1,63 +1,60 @@
-document.getElementById('register-form').addEventListener('submit', async function (e) {
-  e.preventDefault();
+// app.js (use this instead of your old version)
+const express = require('express');
+const sqlite3 = require('sqlite3').verbose();
+const bodyParser = require('body-parser');
+const path = require('path');
 
-  const data = {
-    fullName: document.getElementById('fullName').value,
-    email: document.getElementById('email').value,
-    phone: document.getElementById('phone').value,
-    dob: document.getElementById('dob').value,
-    parentName: document.getElementById('parentName').value,
-    parentJob: document.getElementById('parentJob').value,
-    school: document.getElementById('school').value,
-    schoolAddress: document.getElementById('schoolAddress').value
-  };
+const app = express();
+const dbPath = path.join(__dirname, 'school.db');
+const db = new sqlite3.Database(dbPath);
 
-  try {
-    const res = await fetch('http://localhost:3000/api/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    });
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(express.static(__dirname)); // serve static files like HTML, CSS
 
-    const result = await res.json();
-    if (res.ok) {
-      alert('Registration successful!');
-      window.location.href = 'login.html';
-    } else {
-      alert('Error: ' + result.message);
-    }
-  } catch (err) {
-    alert('Network error: ' + err.message);
-  }
+// Create student table if it doesn't exist
+db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS students (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    phone TEXT,
+    dob TEXT,
+    parent_name TEXT,
+    parent_job TEXT,
+    school_name TEXT,
+    school_address TEXT
+  )`);
 });
-// Redirect to login if not logged in
-document.querySelectorAll('.join-now-button').forEach(button => {
-  button.addEventListener('click', (e) => {
-    e.preventDefault();
-    const courseLink = e.target.getAttribute('data-course');
 
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
+// Route to register student
+app.post('/register', (req, res) => {
+  const { name, phone, dob, parent_name, parent_job, school_name, school_address } = req.body;
+  const sql = `INSERT INTO students (name, phone, dob, parent_name, parent_job, school_name, school_address)
+               VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
-    if (isLoggedIn === 'true') {
-      // If logged in, go to the course
-      window.location.href = courseLink;
-    } else {
-      // Save course to redirect after login
-      localStorage.setItem('redirectAfterLogin', courseLink);
-      // Redirect to login page
-      window.location.href = 'login.html';
+  db.run(sql, [name, phone, dob, parent_name, parent_job, school_name, school_address], function(err) {
+    if (err) {
+      return res.status(500).send('Error saving student data');
     }
+    res.send('Student registered successfully with ID: ' + this.lastID);
   });
 });
-const logoutBtn = document.getElementById('logout-btn');
-if (logoutBtn) {
-  logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem('isLoggedIn');
-    window.location.href = 'index.html'; // or wherever you want
+
+// Route to list all students (optional for admin panel)
+app.get('/students', (req, res) => {
+  db.all('SELECT * FROM students', (err, rows) => {
+    if (err) {
+      return res.status(500).send('Failed to fetch students');
+    }
+    res.json(rows);
   });
-}
+});
+
+app.listen(3000, () => {
+  console.log('Server running at http://localhost:3000');
+});
+
+
 
 
 

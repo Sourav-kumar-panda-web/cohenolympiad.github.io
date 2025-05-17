@@ -1,46 +1,65 @@
+/* register.css */
+
 body {
-  font-family: Arial, sans-serif;
-  background: #f0f0f0;
+  background: #f4f7f8;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  margin: 0;
 }
 
-.register-container {
-  background-color: white;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 350px;
-}
-
-.register-container h2 {
+h2 {
   text-align: center;
-  margin-bottom: 20px;
+  color: #e85d04;
+  margin-bottom: 25px;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px #ffba08;
 }
 
-label {
-  display: block;
-  margin-top: 10px;
+form {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(232, 93, 4, 0.25);
+  width: 350px;
+  box-sizing: border-box;
 }
 
 input {
   width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  box-sizing: border-box;
+  padding: 12px 15px;
+  margin-bottom: 18px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  outline: none;
+}
+
+input:focus {
+  border-color: #e85d04;
+  box-shadow: 0 0 6px #ffba08;
 }
 
 button {
   width: 100%;
-  padding: 10px;
-  margin-top: 15px;
-  background-color: #0077cc;
+  padding: 14px 0;
+  background: #e85d04;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 700;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background: #ffba08;
+  color: #333;
+  box-shadow: 0 0 12px #ffba08;
 }
 
 
