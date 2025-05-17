@@ -1,55 +1,52 @@
-// models/userModel.js
-const db = require('../../config/db');
+// usermodel.js
+const bcrypt = require('bcrypt');
+const db = require('./database');
+const saltRounds = 10;
 
-// Register a new user (student)
-const createUser = (userData, callback) => {
-  const {
-    name,
-    phone,
-    dob,
-    parent_name,
-    parent_job,
-    school_name,
-    school_address
-  } = userData;
+// Register new student with password hashing
+function registerStudent(studentData, callback) {
+  bcrypt.hash(studentData.password, saltRounds, (err, hash) => {
+    if (err) return callback(err);
 
-  const sql = `
-    INSERT INTO students (name, phone, dob, parent_name, parent_job, school_name, school_address)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `;
+    const sql = `INSERT INTO students 
+      (name, email, phone, dob, parent_name, parent_job, school_name, school_address, password) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-  db.run(sql, [name, phone, dob, parent_name, parent_job, school_name, school_address], function(err) {
-    if (err) {
-      return callback(err);
-    }
-    callback(null, { id: this.lastID });
+    db.run(sql, [
+      studentData.name,
+      studentData.email,
+      studentData.phone,
+      studentData.dob,
+      studentData.parent_name,
+      studentData.parent_job,
+      studentData.school_name,
+      studentData.school_address,
+      hash
+    ], function(err) {
+      if (err) return callback(err);
+      callback(null, { id: this.lastID });
+    });
   });
-};
+}
 
-// Find a user by phone and dob (used for login)
-const findUserByPhoneAndDob = (phone, dob, callback) => {
-  const sql = `SELECT * FROM students WHERE phone = ? AND dob = ?`;
-  db.get(sql, [phone, dob], (err, row) => {
-    if (err) {
-      return callback(err);
-    }
-    callback(null, row);
+// Authenticate student login
+function authenticateStudent(email, password, callback) {
+  db.get("SELECT * FROM students WHERE email = ?", [email], (err, row) => {
+    if (err) return callback(err);
+    if (!row) return callback(null, false); // no user
+
+    bcrypt.compare(password, row.password, (err, res) => {
+      if (err) return callback(err);
+      if (res) {
+        // Remove password from returned user object
+        delete row.password;
+        return callback(null, row);
+      } else {
+        return callback(null, false);
+      }
+    });
   });
-};
+}
 
-// Get user by ID
-const findUserById = (id, callback) => {
-  const sql = `SELECT * FROM students WHERE id = ?`;
-  db.get(sql, [id], (err, row) => {
-    if (err) {
-      return callback(err);
-    }
-    callback(null, row);
-  });
-};
+module.exports = { registerStudent, authenticateStudent };
 
-module.exports = {
-  createUser,
-  findUserByPhoneAndDob,
-  findUserById
-};

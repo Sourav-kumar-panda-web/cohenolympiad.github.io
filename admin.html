@@ -1,31 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin - Registered Students</title>
-  <link rel="stylesheet" href="admin.css" />
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1e1e2f;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #444;
+      text-align: left;
+    }
+    th {
+      background: #333;
+    }
+    tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.02);
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Admin Dashboard</h1>
-  </header>
-  <main>
-    <section>
-      <h2>Registered Students</h2>
-      <table id="students-table">
-        <thead>
-          <tr>
-            <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>DOB</th><th>Parent Name</th><th>School Name</th><th>Actions</th>
 
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Rows will be added here by JS -->
-        </tbody>
-      </table>
-    </section>
-  </main>
-  <script src="admin.js"></script>
+<h1>Admin Dashboard</h1>
+
+<table id="studentTable">
+  <thead>
+    <tr>
+      <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Parent Phone</th>
+      <th>School</th><th>Class</th><th>Division</th><th>Subjects</th><th>Hobbies</th>
+      <th>Percentage</th><th>UTR No.</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+  fetch('/admin-dashboard')
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.querySelector("#studentTable tbody");
+      data.forEach(s => {
+        const row = `
+          <tr>
+            <td>${s.id}</td>
+            <td>${s.name}</td>
+            <td>${s.email}</td>
+            <td>${s.phone}</td>
+            <td>${s.parent_phone}</td>
+            <td>${s.school}</td>
+            <td>${s.class}</td>
+            <td>${s.division}</td>
+            <td>${s.subjects}</td>
+            <td>${s.hobbies}</td>
+            <td>${s.percentage}</td>
+            <td>
+  <input type="text" value="${s.utr || ''}" id="utr-${s.id}" style="width: 80px;">
+  <button onclick="updateUTR(${s.id})">Save</button>
+</td>
+
+          </tr>`;
+        tbody.insertAdjacentHTML('beforeend', row);
+      });
+    })
+    .catch(err => {
+      console.error("Failed to load student data:", err);
+    });
+    function updateUTR(id) {
+  const utr = document.getElementById(`utr-${id}`).value;
+  fetch(`/admin/update-utr`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, utr })
+  })
+  .then(res => {
+    if (res.ok) alert('UTR updated');
+    else alert('Failed to update UTR');
+  });
+}
+</script>
+
 </body>
 </html>
+
+

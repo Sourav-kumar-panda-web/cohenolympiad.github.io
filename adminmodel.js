@@ -1,29 +1,22 @@
-// models/adminModel.js
-const db = require('../../config/db');
+// adminmodel.js
+const bcrypt = require('bcrypt');
 
-// Admin login - since admins might be few, you can keep hardcoded or create a table.
-// Here's an example of a simple function to verify admin credentials from a table called 'admins'
+// For demo, only one admin user with hashed password
+// You should hash "admin123" in advance and paste the hash here:
+const adminUser = {
+  username: "admin",
+  // hash for password 'admin123' (generate with bcrypt)
+  passwordHash: "$2b$10$e/5twhXT4N6V8FzxF0AxV.BjF6OJKAVmR8MLGZHH62uCGclX9P0T6"
+};
 
-const getAdminByUsername = (username, callback) => {
-  const sql = `SELECT * FROM admins WHERE username = ?`;
-  db.get(sql, [username], (err, row) => {
-    if (err) {
-      return callback(err);
-    }
-    callback(null, row);
+function authenticateAdmin(username, password, callback) {
+  if (username !== adminUser.username) return callback(null, false);
+  bcrypt.compare(password, adminUser.passwordHash, (err, res) => {
+    if (err) return callback(err);
+    if (res) return callback(null, adminUser);
+    return callback(null, false);
   });
-};
+}
 
-// Alternatively, if you want to keep admins hardcoded:
-const admins = [
-  { username: 'admin', password: 'admin123' }
-];
+module.exports = { authenticateAdmin };
 
-const validateAdmin = (username, password) => {
-  return admins.some(admin => admin.username === username && admin.password === password);
-};
-
-module.exports = {
-  getAdminByUsername,
-  validateAdmin
-};
