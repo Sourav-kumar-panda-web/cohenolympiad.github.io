@@ -1,1 +1,1 @@
-**cohenolympiad.github.io**
+**cohenolympiadschool.github.io**
